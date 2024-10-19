@@ -1,0 +1,6 @@
+@TreeNodeApp.API_HostAddress = http://localhost:5224
+
+GET {{TreeNodeApp.API_HostAddress}}/api/
+Accept: application/json
+
+###
