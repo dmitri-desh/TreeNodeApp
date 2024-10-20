@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TreeNodeApp.API.ExceptionService;
 using TreeNodeApp.Application.DTOs;
 using TreeNodeApp.Application.Interfaces;
+using TreeNodeApp.Application.Services;
 
 namespace TreeNodeApp.API.Controllers
 {
@@ -10,16 +12,19 @@ namespace TreeNodeApp.API.Controllers
     public class TreeController : ControllerBase
     {
         private readonly ITreeService _treeService;
+        private readonly IExceptionService _exceptionService;
 
-        public TreeController(ITreeService treeService)
+        public TreeController(ITreeService treeService, IExceptionService exceptionService)
         {
             _treeService = treeService;
+            _exceptionService = exceptionService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TreeDto>>> GetAllTrees()
         {
             var trees = await _treeService.GetAllAsync();
+
             return Ok(trees);
         }
 
@@ -27,8 +32,10 @@ namespace TreeNodeApp.API.Controllers
         public async Task<ActionResult<TreeDto>> GetById(int id)
         {
             var tree = await _treeService.GetByIdAsync(id);
+
             if (tree == null)
                 return NotFound();
+
             return Ok(tree);
         }
 
@@ -36,6 +43,7 @@ namespace TreeNodeApp.API.Controllers
         public async Task<IActionResult> CreateTree(CreateTreeDto treeDto)
         {
             await _treeService.AddAsync(treeDto);
+                       
             return CreatedAtAction(nameof(GetById), new { id = treeDto.Id }, treeDto);
         }
 
@@ -43,6 +51,7 @@ namespace TreeNodeApp.API.Controllers
         public async Task<IActionResult> UpdateTree(TreeDto treeDto)
         {
             await _treeService.UpdateAsync(treeDto);
+
             return NoContent();
         }
 
@@ -50,6 +59,7 @@ namespace TreeNodeApp.API.Controllers
         public async Task<IActionResult> DeleteTree(int id)
         {
             await _treeService.DeleteAsync(id);
+          
             return NoContent();
         }
     }

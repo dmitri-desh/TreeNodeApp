@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 using System;
+using TreeNodeApp.API.ExceptionService;
 using TreeNodeApp.API.Mappings;
-using TreeNodeApp.API.Middleware;
 using TreeNodeApp.Application.Interfaces;
 using TreeNodeApp.Application.Services;
 using TreeNodeApp.Infrastructure.Data;
@@ -31,12 +31,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<INodeService, NodeService>();
 builder.Services.AddScoped<ITreeService, TreeService>();
 builder.Services.AddScoped<IExceptionLogService, ExceptionLogService>();
+builder.Services.AddScoped<IExceptionService, ExceptionService>();
 
 builder.Services.AddScoped<INodeRepository, NodeRepository>();
 builder.Services.AddScoped<ITreeRepository, TreeRepository>();
 builder.Services.AddScoped<IExceptionLogRepository, ExceptionLogRepository>();
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(options => options.Filters.Add<ExceptionFilter>())
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -51,8 +52,6 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 app.UseRouting();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 

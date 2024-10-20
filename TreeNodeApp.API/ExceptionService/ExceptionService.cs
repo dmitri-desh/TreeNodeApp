@@ -1,50 +1,35 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
+using TreeNodeApp.Application.Interfaces;
 using TreeNodeApp.Core.Entities;
 using TreeNodeApp.Core.Enums;
 using TreeNodeApp.Core.Exceptions;
 using TreeNodeApp.Infrastructure.Interfaces;
 
-namespace TreeNodeApp.API.Middleware
+namespace TreeNodeApp.API.ExceptionService
 {
-    public class ExceptionHandlingMiddleware
+    public class ExceptionService : IExceptionService
     {
-        private readonly RequestDelegate _next;
         private readonly IExceptionLogRepository _exceptionLogRepository;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, IExceptionLogRepository exceptionLogRepository)
+        public ExceptionService(IExceptionLogRepository exceptionLogRepository)
         {
-            _next = next;
             _exceptionLogRepository = exceptionLogRepository;
         }
 
-        public async Task InvokeAsync(HttpContext context)
-        {
-            context.Request.EnableBuffering();
-
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                await HandleExceptionAsync(context, ex);
-            }
-        }
-
-        private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        public async Task LogExceptionAsync(Exception exception, HttpContext context)
         {
             var eventId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            var exceptionType = ex is SecureException ? ExceptionType.SecureException : ExceptionType.Exception;
-            var message = ex is SecureException ? ex.Message : $"Internal server error ID = {eventId}";
+            var exceptionType = exception is SecureException ? ExceptionType.SecureException : ExceptionType.Exception;
+            var message = exception is SecureException ? exception.Message : $"Internal server error ID = {eventId}";
 
             var exceptionLog = new ExceptionLog
             {
                 EventId = long.Parse(eventId),
                 Timestamp = DateTime.UtcNow,
                 Type = exceptionType,
-                Message = ex.Message,
-                StackTrace = ex.StackTrace,
+                Message = exception.Message,
+                StackTrace = exception.StackTrace,
                 QueryParameters = context.Request.QueryString.ToString(),
                 BodyParameters = await new StreamReader(context.Request.Body).ReadToEndAsync()
             };
