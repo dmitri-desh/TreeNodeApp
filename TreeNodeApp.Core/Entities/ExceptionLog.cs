@@ -12,7 +12,7 @@ namespace TreeNodeApp.Core.Entities
     public class ExceptionLog
     {
         [Key]
-        public long Id { get; set; }
+        public int Id { get; set; }
         public long EventId { get; set; }
         public DateTime Timestamp { get; set; }
         public string QueryParameters { get; set; }

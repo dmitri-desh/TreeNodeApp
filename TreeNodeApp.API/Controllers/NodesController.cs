@@ -45,26 +45,116 @@ namespace TreeNodeApp.API.Controllers
 
         [HttpPost]
         public async Task<IActionResult> CreateNode(CreateNodeDto nodeDto)
-        {           
-            await _nodeService.AddAsync(nodeDto);
-           
-            return CreatedAtAction(nameof(GetById), new { id = nodeDto.Id }, nodeDto);
+        {   
+            try
+            {
+                await _nodeService.AddAsync(nodeDto);
+                return CreatedAtAction(nameof(GetById), new { id = nodeDto.Id }, nodeDto);
+            }
+            catch (SecureException ex)
+            {
+                var eventId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+                await _exceptionService.LogExceptionAsync(ex, HttpContext);
+
+                var result = new
+                {
+                    type = "Secure",
+                    id = eventId,
+                    data = new { message = ex.Message }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            catch (Exception ex)
+            {
+                var eventId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+                await _exceptionService.LogExceptionAsync(ex, HttpContext);
+
+                var result = new
+                {
+                    type = "Exception",
+                    id = eventId,
+                    data = new { message = $"Internal server error ID = {eventId}" }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateNode(UpdateNodeDto nodeDto)
         {
-            await _nodeService.UpdateAsync(nodeDto);
-            
-            return NoContent();
+            try
+            {
+                await _nodeService.UpdateAsync(nodeDto);
+                return NoContent();
+            }
+            catch (SecureException ex)
+            {
+                var eventId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+                await _exceptionService.LogExceptionAsync(ex, HttpContext);
+
+                var result = new
+                {
+                    type = "Secure",
+                    id = eventId,
+                    data = new { message = ex.Message }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            catch (Exception ex)
+            {
+                var eventId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+                await _exceptionService.LogExceptionAsync(ex, HttpContext);
+
+                var result = new
+                {
+                    type = "Exception",
+                    id = eventId,
+                    data = new { message = $"Internal server error ID = {eventId}" }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNode(int id)
         {
-            await _nodeService.DeleteAsync(id);
-           
-            return NoContent();
+            try
+            {
+                await _nodeService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (SecureException ex)
+            {
+                var eventId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+                await _exceptionService.LogExceptionAsync(ex, HttpContext);
+
+                var result = new
+                {
+                    type = "Secure",
+                    id = eventId,
+                    data = new { message = ex.Message }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            catch (Exception ex)
+            {
+                var eventId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+                await _exceptionService.LogExceptionAsync(ex, HttpContext);
+
+                var result = new
+                {
+                    type = "Exception",
+                    id = eventId,
+                    data = new { message = $"Internal server error ID = {eventId}" }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
         }
     }
 }

@@ -37,7 +37,7 @@ builder.Services.AddScoped<INodeRepository, NodeRepository>();
 builder.Services.AddScoped<ITreeRepository, TreeRepository>();
 builder.Services.AddScoped<IExceptionLogRepository, ExceptionLogRepository>();
 
-builder.Services.AddControllers(options => options.Filters.Add<ExceptionFilter>())
+builder.Services.AddControllers(/* options => options.Filters.Add<ExceptionFilter>() */)
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
