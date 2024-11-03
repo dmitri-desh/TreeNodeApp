@@ -37,7 +37,7 @@ builder.Services.AddScoped<INodeRepository, NodeRepository>();
 builder.Services.AddScoped<ITreeRepository, TreeRepository>();
 builder.Services.AddScoped<IExceptionLogRepository, ExceptionLogRepository>();
 
-builder.Services.AddControllers(/* options => options.Filters.Add<ExceptionFilter>() */)
+builder.Services.AddControllers(options => options.Filters.Add<ExceptionFilter>())
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -55,10 +55,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.UseEndpoints(endpoints => endpoints.MapControllers());
 
 using (var scope = app.Services.CreateScope())
 {
